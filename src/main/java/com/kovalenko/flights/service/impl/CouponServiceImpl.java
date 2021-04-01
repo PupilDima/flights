@@ -1,13 +1,16 @@
 package com.kovalenko.flights.service.impl;
 
+import com.kovalenko.flights.entity.Coupon;
 import com.kovalenko.flights.entity.HardcodedDataCapacitor;
 import com.kovalenko.flights.provider.RandomDiscountProvider;
+import com.kovalenko.flights.service.CouponService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CouponServiceImpl {
+public class CouponServiceImpl implements CouponService {
+
     private static final Logger LOG = LogManager.getLogger(CouponServiceImpl.class);
 
     private final RandomDiscountProvider randomDiscountProvider;
@@ -18,14 +21,16 @@ public class CouponServiceImpl {
         this.hardcodedDataCapacitor = hardcodedDataCapacitor;
     }
 
-    double processDiscount(int couponId, double ticketPrice) {
-        hardcodedDataCapacitor.getCoupons().stream().filter(couponItem ->
-                couponItem.getCouponId() == couponId)
-                .findAny()
-                .orElseThrow(() -> new IllegalArgumentException(String.format("Wrong coupon id: %d!", couponId)));
+    @Override
+    public double processDiscount(int couponId, double ticketPrice) {
+        Coupon coupon = hardcodedDataCapacitor.getCoupons().stream()
+                .filter(couponItem -> couponItem.getCouponId() == couponId)
+                .findAny().orElse(null);
 
-        LOG.error(String.format("Wrong coupon id: %d!", couponId));
-
+        if(coupon == null) {
+            LOG.error(String.format("Wrong coupon id %d: !", couponId));
+            throw new IllegalArgumentException(String.format("Wrong coupon id %d: !", couponId));
+        }
 
         return ticketPrice * randomDiscountProvider.provideRandomDiscount();
     }
