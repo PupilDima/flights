@@ -16,7 +16,7 @@ public class RandomDiscountProviderImpl implements RandomDiscountProvider {
     @Override
     public double provideRandomDiscount() {
 
-        double[] discounts = {0.1, 0.5, 0.6};
+        double[] discounts = {0.1d, 0.5d, 0.6d};
         int randomDiscountIndex = randomProvider.provideRandomNum(3);
 
         return discounts[randomDiscountIndex];
